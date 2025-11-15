@@ -9,8 +9,16 @@ export async function getGoogleCalendarClient(userId: string) {
     },
   })
 
-  if (!account?.access_token) {
-    throw new Error("Google account not connected")
+  console.log("Account found:", account ? "Yes" : "No")
+  console.log("Access token exists:", !!account?.access_token)
+  console.log("Refresh token exists:", !!account?.refresh_token)
+
+  if (!account) {
+    throw new Error("Google account not found. Please log in again.")
+  }
+
+  if (!account.access_token) {
+    throw new Error("Google access token not found. Please re-authenticate with Google.")
   }
 
   const oauth2Client = new google.auth.OAuth2(
@@ -20,7 +28,7 @@ export async function getGoogleCalendarClient(userId: string) {
 
   oauth2Client.setCredentials({
     access_token: account.access_token,
-    refresh_token: account.refresh_token,
+    refresh_token: account.refresh_token || undefined,
   })
 
   return google.calendar({ version: "v3", auth: oauth2Client })

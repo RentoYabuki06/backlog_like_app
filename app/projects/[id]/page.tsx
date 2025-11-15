@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Plus, CheckCircle2, Clock, AlertCircle, Trash2 } from "lucide-react"
 
@@ -25,13 +25,10 @@ interface Project {
   tasks: Task[]
 }
 
-export default function ProjectDetailPage({
-  params,
-}: {
-  params: { id: string }
-}) {
+export default function ProjectDetailPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const params = useParams()
   const [project, setProject] = useState<Project | null>(null)
   const [loading, setLoading] = useState(true)
   const [showTaskModal, setShowTaskModal] = useState(false)
@@ -58,7 +55,7 @@ export default function ProjectDetailPage({
 
   const fetchProject = async () => {
     try {
-      const response = await fetch(`/api/projects/${params.id}`)
+      const response = await fetch(`/api/projects/${params.id as string}`)
       if (response.ok) {
         const data = await response.json()
         setProject(data)
@@ -81,7 +78,7 @@ export default function ProjectDetailPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...taskFormData,
-          projectId: params.id,
+          projectId: params.id as string,
         }),
       })
 

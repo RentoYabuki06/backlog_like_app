@@ -5,6 +5,14 @@ import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Plus, FolderKanban, Trash2, Edit2 } from "lucide-react"
+import {
+  Modal,
+  FormContainer,
+  FormField,
+  Input,
+  Textarea,
+  FormActions,
+} from "@/components/ui/form"
 
 interface Project {
   id: string
@@ -188,70 +196,52 @@ export default function ProjectsPage() {
       </div>
 
       {/* Create Project Modal */}
-      {showCreateModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4">新規プロジェクト作成</h2>
-            <form onSubmit={handleCreateProject}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  プロジェクト名 *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  説明
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description: e.target.value })
-                  }
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  カラー
-                </label>
-                <input
-                  type="color"
-                  value={formData.color}
-                  onChange={(e) =>
-                    setFormData({ ...formData, color: e.target.value })
-                  }
-                  className="w-full h-10 rounded-md cursor-pointer"
-                />
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowCreateModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  キャンセル
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  作成
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Modal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        title="新規プロジェクト作成"
+      >
+        <FormContainer onSubmit={handleCreateProject}>
+          <FormField label="プロジェクト名" required>
+            <Input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              placeholder="プロジェクト名を入力"
+            />
+          </FormField>
+
+          <FormField label="説明">
+            <Textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              rows={3}
+              placeholder="プロジェクトの説明（任意）"
+            />
+          </FormField>
+
+          <FormField label="カラー">
+            <Input
+              type="color"
+              value={formData.color}
+              onChange={(e) =>
+                setFormData({ ...formData, color: e.target.value })
+              }
+              className="h-10 cursor-pointer"
+            />
+          </FormField>
+
+          <FormActions
+            onCancel={() => setShowCreateModal(false)}
+            submitLabel="作成"
+          />
+        </FormContainer>
+      </Modal>
     </div>
   )
 }

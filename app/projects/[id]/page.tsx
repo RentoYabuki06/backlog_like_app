@@ -5,6 +5,15 @@ import { useSession } from "next-auth/react"
 import { useRouter, useParams } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Plus, CheckCircle2, Clock, AlertCircle, Trash2 } from "lucide-react"
+import {
+  Modal,
+  FormContainer,
+  FormField,
+  Input,
+  Textarea,
+  Select,
+  FormActions,
+} from "@/components/ui/form"
 
 interface Task {
   id: string
@@ -282,7 +291,7 @@ export default function ProjectDetailPage() {
                       onChange={(e) =>
                         handleUpdateTaskStatus(task.id, e.target.value)
                       }
-                      className="w-full text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                     >
                       <option value="TODO">未着手</option>
                       <option value="IN_PROGRESS">進行中</option>
@@ -298,134 +307,109 @@ export default function ProjectDetailPage() {
       </div>
 
       {/* Create Task Modal */}
-      {showTaskModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 max-w-md w-full max-h-screen overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-4">新規タスク作成</h2>
-            <form onSubmit={handleCreateTask}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  タスク名 *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={taskFormData.title}
-                  onChange={(e) =>
-                    setTaskFormData({ ...taskFormData, title: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  説明
-                </label>
-                <textarea
-                  value={taskFormData.description}
-                  onChange={(e) =>
-                    setTaskFormData({
-                      ...taskFormData,
-                      description: e.target.value,
-                    })
-                  }
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    優先度
-                  </label>
-                  <select
-                    value={taskFormData.priority}
-                    onChange={(e) =>
-                      setTaskFormData({
-                        ...taskFormData,
-                        priority: e.target.value,
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="LOW">低</option>
-                    <option value="MEDIUM">中</option>
-                    <option value="HIGH">高</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    ステータス
-                  </label>
-                  <select
-                    value={taskFormData.status}
-                    onChange={(e) =>
-                      setTaskFormData({
-                        ...taskFormData,
-                        status: e.target.value,
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="TODO">未着手</option>
-                    <option value="IN_PROGRESS">進行中</option>
-                    <option value="DONE">完了</option>
-                    <option value="ON_HOLD">保留</option>
-                  </select>
-                </div>
-              </div>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  期限
-                </label>
-                <input
-                  type="date"
-                  value={taskFormData.dueDate}
-                  onChange={(e) =>
-                    setTaskFormData({
-                      ...taskFormData,
-                      dueDate: e.target.value,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  見積もり時間（時間）
-                </label>
-                <input
-                  type="number"
-                  step="0.5"
-                  value={taskFormData.estimatedHours}
-                  onChange={(e) =>
-                    setTaskFormData({
-                      ...taskFormData,
-                      estimatedHours: e.target.value,
-                    })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  type="button"
-                  onClick={() => setShowTaskModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  キャンセル
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  作成
-                </button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showTaskModal}
+        onClose={() => setShowTaskModal(false)}
+        title="新規タスク作成"
+      >
+        <FormContainer onSubmit={handleCreateTask}>
+          <FormField label="タスク名" required>
+            <Input
+              type="text"
+              required
+              value={taskFormData.title}
+              onChange={(e) =>
+                setTaskFormData({ ...taskFormData, title: e.target.value })
+              }
+              placeholder="タスク名を入力"
+            />
+          </FormField>
+
+          <FormField label="説明">
+            <Textarea
+              value={taskFormData.description}
+              onChange={(e) =>
+                setTaskFormData({
+                  ...taskFormData,
+                  description: e.target.value,
+                })
+              }
+              rows={3}
+              placeholder="タスクの説明（任意）"
+            />
+          </FormField>
+
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label="優先度">
+              <Select
+                value={taskFormData.priority}
+                onChange={(e) =>
+                  setTaskFormData({
+                    ...taskFormData,
+                    priority: e.target.value,
+                  })
+                }
+                options={[
+                  { value: "LOW", label: "低" },
+                  { value: "MEDIUM", label: "中" },
+                  { value: "HIGH", label: "高" },
+                ]}
+              />
+            </FormField>
+
+            <FormField label="ステータス">
+              <Select
+                value={taskFormData.status}
+                onChange={(e) =>
+                  setTaskFormData({
+                    ...taskFormData,
+                    status: e.target.value,
+                  })
+                }
+                options={[
+                  { value: "TODO", label: "未着手" },
+                  { value: "IN_PROGRESS", label: "進行中" },
+                  { value: "DONE", label: "完了" },
+                  { value: "ON_HOLD", label: "保留" },
+                ]}
+              />
+            </FormField>
           </div>
-        </div>
-      )}
+
+          <FormField label="期限">
+            <Input
+              type="date"
+              value={taskFormData.dueDate}
+              onChange={(e) =>
+                setTaskFormData({
+                  ...taskFormData,
+                  dueDate: e.target.value,
+                })
+              }
+            />
+          </FormField>
+
+          <FormField label="見積もり時間（時間）" className="mb-0">
+            <Input
+              type="number"
+              step="0.5"
+              value={taskFormData.estimatedHours}
+              onChange={(e) =>
+                setTaskFormData({
+                  ...taskFormData,
+                  estimatedHours: e.target.value,
+                })
+              }
+              placeholder="例: 2.5"
+            />
+          </FormField>
+
+          <FormActions
+            onCancel={() => setShowTaskModal(false)}
+            submitLabel="作成"
+          />
+        </FormContainer>
+      </Modal>
     </div>
   )
 }
